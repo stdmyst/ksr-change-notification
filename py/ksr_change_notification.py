@@ -11,13 +11,11 @@ import json
 def send_mail(content):
     with open("../files/settings.json", encoding="UTF-8") as f:
         settings = json.load(f)
-        
-    smtp_server = settings["smtp_server"]
-    port = settings["port"]
-    password = settings["password"]
-    sender_email = settings["sender_email"]
-    receiver_email = settings["receiver_email"]
-    subject = settings["subject"]
+    
+    (
+        smtp_server, port, password,
+        sender_email, receiver_email,subject
+    ) = settings.values()
     
     msg = EmailMessage()
     msg.set_content(content)
@@ -41,10 +39,11 @@ def find_date():
     driver = wd.Chrome(options=options)
     driver.get("https://fgiscs.minstroyrf.ru/ksr")
     time.sleep(1)
-    new_data_of_change = driver.find_element(By.CLASS_NAME, 'data-of-change')
+    new_data_of_change = driver.find_element(By.CLASS_NAME, 'data-of-change').text
     
     with open("../files/ksr_change_notification.log", "r+", encoding="UTF-8") as file:
-        if new_data_of_change.text not in file.read():
+        print(new_data_of_change)
+        if new_data_of_change not in file.read():
             file.seek(0)
             file.write(new_data_of_change.text)
             send_mail(f"Доступна новая версия КСР\r\n\n{new_data_of_change.text}\r\n\nСсылка на страницу загрузки: https://fgiscs.minstroyrf.ru/ksr")
